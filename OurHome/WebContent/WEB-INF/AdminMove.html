@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>修改数据</title>
+    <link href="aspx/css/bootstrap.min.css" rel="stylesheet">
+    <link href="aspx/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">空气质量查询系统</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">空气质量查询系统</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <form action="BackAdminInterface" method="post">
+            <ul class="nav navbar-nav" role="tablist">
+               <li class="active"><a aria-controls="index_page" role="tab" data-toggle="tab" onclick='ona1click()'>主要污染物</a></li>
+                <li><a aria-controls="chart_page" role="tab" data-toggle="tab" onclick='ona2click()'>污染物数值</a></li>
+                <li><a aria-controls="table_page" role="tab" data-toggle="tab" onclick='ona3click(3)'>天气质量</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">          
+                <li id="nav_login"><button data-toggle='modal' data-target='#myModal'type="submit">返回</button></li>          
+                <li id="nav_logout" style="display: none"><a href="/logout.aspx">注销</a></li>
+            </ul>
+          </form>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="tab-content">
+        <div role="tabpanel" class="row tab-pane active" id="index_page">
+            <div class="col-xs-12" style="padding: 10px">
+                <form class="form-inline" id="form" action="DealData">
+                    <div class="form-group">
+                        <label class="control-label" for="area">请选择地市</label>
+                        <select class="form-control" id="area" name="area">
+                            <option>请选择</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="place">请选择区域</label>
+                        <select class="form-control" id="place" name="place">
+                            <option>请选择</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="time">请选择时间</label>
+                        <input id="time" class="form-control" readonly>
+                    </div>
+                    <div class="form-group"  id="page1">
+                        <label class="control-label" for="major">请选择主要污染物</label>
+                        <select class="form-control" id="major" name="major">
+                            <option>请选择</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display:none" id="page2">
+                        <label class="control-label" for="place">请选择污染物</label>
+                        <select class="form-control" id="pollutant" name="pollutant">
+                            <option>请选择</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display:none" id="page3">
+                        <label class="control-label" for="quality">请选择天气质量</label>
+                        <select class="form-control" id="quality" name="quality">
+                            <option>请选择</option>
+                        </select>
+                    </div>
+                    <input class="btn btn-default" id="select" type="button" onclick="send()" value="查询">
+                </form>
+            </div>
+            <div class="col-xs-12">
+                <table id="table" class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th>市</th>
+                        <th>区</th>
+                        <th>时间</th>
+                        <th style="display:none">AQI</th>
+                        <th style="display:none">AQItype</th>
+                        <th style="display:none">污染指数</th>
+                        <th style="display:none">PM10</th>
+                        <th style="display:none">CO</th>
+                        <th style="display:none">NO2</th>
+                        <th style="display:none">O3/h</th>
+                        <th style="display:none">O3/8h</th>
+                        <th style="display:none">SO2</th>
+                        <th>主要污染物</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="aspx/js/jquery.min.js"></script>
+<script src="aspx/js/bootstrap.min.js"></script>
+<script src="aspx/js/bootstrap-datetimepicker.min.js"></script>
+<script src="aspx/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="aspx/js/Chart.min.js"></script>
+<script>
+var sign = 1;
+var mark = 0;
+var otable = document.getElementById('table');
+var oth = otable.getElementsByTagName('th')
+function init(){
+	clearTab();
+	var page1 = document.getElementById('page1');
+	var page2 = document.getElementById('page2');
+	var page3 = document.getElementById('page3');
+	page1.style.display = 'none';
+	page2.style.display = 'none';
+	page3.style.display = 'none';
+	for (var i = 3; i < oth.length; i++)
+		oth[i].style.display = 'none';
+}
+function ona1click(){
+	var page1 = document.getElementById('page1');
+	init();
+	page1.style.display='inline-block';
+	sign = 1;
+	//oth[2].style.display = 'table-cell';
+	//oth[3].style.display = 'table-cell';
+	oth[12].style.display = 'table-cell';
+}
+function ona2click(){
+	var page2 = document.getElementById('page2');
+	init();
+	page2.style.display='inline-block';
+	sign = 2;
+	oth[5].style.display = 'table-cell';
+	//oth[12].style.display = 'table-cell';
+}
+function ona3click(){
+	var page3 = document.getElementById('page3');
+	init();
+	page3.style.display='inline-block';
+	sign = 3;
+	oth[4].style.display = 'table-cell';
+	oth[3].style.display = 'table-cell';
+}
+
+var Tbody = document.getElementById('tbody');
+function changeTable1(a, c, b, d, e, f, g, h, i, j, k, l, m) {
+    var otr = document.createElement('tr');
+   
+    otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+m+'</td>';   
+    Tbody.appendChild(otr);
+    //添加删除按钮
+	var btn = document.createElement("BUTTON");
+	var html ="<input type=\"button\" value=\"修改\" >";
+	btn.innerHTML = html;
+	btn.onclick = function(){MoveMajor(a, b, c)};
+    btn.style.position = "absolute";
+    posLeft = otr.offsetLeft + otr.offsetWidth ;
+    strPosLeft = posLeft.toString() + "px";
+	btn.style.left = strPosLeft;
+	strPosTop = otr.offsetTop.toString() + "px";
+	btn.style.top = strPosTop;
+	Tbody.appendChild(btn);
+}
+function MoveMajor(area, place, time){
+	//修改Major	
+	var major = prompt("修改主要污染物", "污染物名称");  
+	var label = "Table1";
+	if(CheckMajor(major)){ 
+		var re = "Move?area="+area+"&place="+place+"&time="+time+"&major="+major+"&label="+label;
+		var url = encodeURI(re);
+		xhr = new XMLHttpRequest();
+		xhr.open('GET', url, true);
+		xhr.send();
+		xhr.onreadystatechange = function() {
+			if (this.readyState == 4)
+				alert("修改完成");
+	    }
+	}
+	
+	else{
+		alert("输入的污染物类型有误");
+	}
+}
+function CheckMajor(major){
+	if(major == "颗粒物(PM2.5)"){
+		return 1;
+	}
+	if(major == "细颗粒物(PM2.5)"){
+		return 1;
+	}
+	if(major == "颗粒物(PM10)"){
+		return 1;
+	}
+	if(major == "臭氧1小时"){
+		return 1;
+	}
+	if(major == "臭氧8小时"){
+		return 1;
+	}
+	if(major == "二氧化硫"){
+		return 1;
+	}
+	if(major == "一氧化氮"){
+		return 1;
+	}
+	if(major == "一氧化碳"){
+		return 1;
+	}
+    return 0;
+}
+function changeTable2(a, c, b, d, e, f, g, h, i, j, k, l, m) {
+	var mtr = document.getElementById("table");
+	var ths = mtr.getElementsByTagName('th');
+    var otr = document.createElement('tr');
+    
+    if (mark == 5)
+   		otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+f+'</td>';
+   	if (mark == 6)
+   		otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+g+'</td>';
+   	if (mark == 7)
+   	   	otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+h+'</td>';
+   	if (mark == 8)
+    	otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+i+'</td>';
+    if (mark == 9)
+    	otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+j+'</td>';
+  	if (mark == 10)
+       	otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+k+'</td>';
+    if (mark == 11)
+       	otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+l+'</td>';
+    var newtd = otr.getElementsByTagName('td');
+    oth[5].style.display = 'table-cell';
+    Tbody.appendChild(otr);
+    //添加删除按钮
+	var btn = document.createElement("BUTTON");
+	var html ="<input type=\"button\" value=\"修改\" >";
+	btn.innerHTML = html;
+	if (mark == 5)
+		btn.onclick = function(){MovePollutionIndex(a, b, c, "f_PM25per1h")};
+   	if (mark == 6)
+   		btn.onclick = function(){MovePollutionIndex(a, b, c, "f_PM10per1h")};
+   	if (mark == 7)
+   		btn.onclick = function(){MovePollutionIndex(a, b, c, "f_COper1h")};
+   	if (mark == 8)
+   		btn.onclick = function(){MovePollutionIndex(a, b, c, "f_NO2per1h")};
+    if (mark == 9)
+    	btn.onclick = function(){MovePollutionIndex(a, b, c, "f_O3per1h")};
+  	if (mark == 10)
+  		btn.onclick = function(){MovePollutionIndex(a, b, c, "f_O3per8h")};
+    if (mark == 11)
+    	btn.onclick = function(){MovePollutionIndex(a, b, c, "f_SO2per1h")};
+	
+    btn.style.position = "absolute";
+    posLeft = otr.offsetLeft + otr.offsetWidth ;
+    strPosLeft = posLeft.toString() + "px";
+	btn.style.left = strPosLeft;
+	strPosTop = otr.offsetTop.toString() + "px";
+	btn.style.top = strPosTop;
+	Tbody.appendChild(btn);
+}
+function MovePollutionIndex(area, place, time, pollution){
+	//修改PollutionIndex	
+	var pollutionIndex = prompt("修改" + pollution + "指数", "数值");  
+	var label = "Table2";
+	if(parseInt(pollutionIndex) > 0){
+		var re = "Move?area="+area+"&place="+place+"&time="+time+"&pollution="+pollution+"&pollutionIndex="+pollutionIndex+"&label="+label;
+		var url = encodeURI(re);
+		xhr = new XMLHttpRequest();
+		xhr.open('GET', url, true);
+		xhr.send();
+		xhr.onreadystatechange = function() {
+			if (this.readyState == 4)
+				alert("修改完成");
+	    }
+	}
+	else{
+		alert("数值不合理");
+	}
+}
+function changeTable3(a, c, b, d, e, f, g, h, i, j, k, l, m) {
+	var otr = document.createElement('tr');
+    otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+e+'</td><td>'+f+'</td>';
+    Tbody.appendChild(otr);
+    //添加删除按钮
+	var btn = document.createElement("BUTTON");
+	var html ="<input type=\"button\" value=\"修改\" >";
+	btn.innerHTML = html;
+	btn.onclick = function(){MoveAQI(a, b, c)};
+    btn.style.position = "absolute";
+    posLeft = otr.offsetLeft + otr.offsetWidth ;
+    strPosLeft = posLeft.toString() + "px";
+	btn.style.left = strPosLeft;
+	strPosTop = otr.offsetTop.toString() + "px";
+	btn.style.top = strPosTop;
+	Tbody.appendChild(btn);
+}
+function MoveAQI(area, place, time){
+	//修改Major	
+	var aQI = prompt("修改AQI的值", "数值");  
+	var label = "Table3";
+	if(parseInt(aQI) > 0){
+		var re = "Move?area="+area+"&place="+place+"&time="+time+"&aQI="+aQI+"&label="+label;
+		var url = encodeURI(re);
+		xhr = new XMLHttpRequest();
+		xhr.open('GET', url, true);
+		xhr.send();
+		xhr.onreadystatechange = function() {
+			if (this.readyState == 4)
+				alert("修改完成");
+	    }
+	}
+	else{
+		alert("数值不合理");
+	}
+}
+
+function clearTab(){
+	var tbody = document.getElementById('tbody');
+	while (tbody.hasChildNodes())
+		{
+			tbody.removeChild(tbody.firstChild);
+		}
+}
+
+function send(){
+	if(JudgmentQueryCondition()){
+		clearTab();
+		var area = document.getElementById('area');
+		var place = document.getElementById('place');
+		var quality = document.getElementById('quality');
+		var time = document.getElementById('time');
+		var major = document.getElementById('major');
+		var re = "DealData?area="+area.value+"&place="+place.value+"&quality="+quality.value+"&time="+time.value+":00:00"+"&major="+major.value;
+		var url = encodeURI(re);
+		xhr = new XMLHttpRequest();
+		xhr.open('GET', url, true);
+		xhr.send();
+		xhr.onreadystatechange = function() {
+			if (this.readyState != 4)
+				return;
+			
+			//alert(json.length);
+			if (this.responseText != '[]')
+			{
+				var json = eval(this.responseText);
+				
+				for (var i= 0; i < json.length; i++)
+					{
+						if (sign == 1)
+						 	changeTable1(json[i].a, json[i].b, json[i].c, json[i].d, json[i].e, json[i].f, json[i].g, json[i].h, json[i].i, json[i].j, json[i].k, json[i].l, json[i].m);
+						if (sign == 2)
+							changeTable2(json[i].a, json[i].b, json[i].c, json[i].d, json[i].e, json[i].f, json[i].g, json[i].h, json[i].i, json[i].j, json[i].k, json[i].l, json[i].m);
+						if (sign == 3)
+							changeTable3(json[i].a, json[i].b, json[i].c, json[i].d, json[i].e, json[i].f, json[i].g, json[i].h, json[i].i, json[i].j, json[i].k, json[i].l, json[i].m);
+					}
+			}
+			else
+				alert("该项为空");
+	    }
+	}
+	else{
+		alert("请输入要修改的类型");
+	}
+}
+
+function JudgmentQueryCondition(){
+	if(sign == 2){		
+		if(0 == mark){
+			return 0;
+		}
+		else{
+			return 1;
+		}
+	}
+	return 1;
+}
+    var area = $("#area"),
+        place = $("#place"),
+        time = $('#time'),
+        pollutant = $("#pollutant"),
+        aqitype = $("#quality"),
+        major = $("#major");
+    
+    time.datetimepicker({
+        language: 'zh-CN',
+        autoclose: true,
+        minuteStep: 60,
+        format: 'yyyy-mm-dd hh',
+        defaultDate: "1990-1-1"
+    });
+    $.ajax({
+        url: "./aspx/pollutant.aspx",
+        dataType: 'json',
+        success: function (response) {
+            dic = response;
+            for (var key in response) {
+                major.append('<option>'+key+'</option>');
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+    $.ajax({
+        url: "./aspx/aqitype.aspx",
+        dataType: 'json',
+        success: function (response) {
+            for (var key in response) {
+            	aqitype.append('<option>'+key+'</option>');
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+    
+    $.ajax({
+        url: "./aspx/queryarea.aspx",
+        dataType: 'json',
+        success: function (response) {
+            for (var key in response) {
+                area.append('<option>'+key+'</option>');
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+   
+    area.change(function () {
+        var key = area.val();
+        $.ajax({
+            url: "./aspx/queryarea.aspx",
+            dataType: 'json',
+            success: function (response) {
+            	place.html('');
+            	
+                place.append('<option>请选择</option>');
+                for (var i = 0;i<response[key].length;i++) {
+                    place.append('<option>'+response[key][i]+'</option>');
+                }
+            },
+            error: function (e) {
+                console.log(e);
+            }
+        });
+    });
+    $.ajax({
+        url: "./aspx/pollutant1.aspx",
+        dataType: 'json',
+        success: function (response) {
+            dic = response;
+            for (var key in response) {
+                pollutant.append('<option>'+key+'</option>');
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+    pollutant.change(function () {
+    	var key = pollutant.val();
+        $.ajax({
+            url: "./aspx/pollutant1.aspx",
+            dataType: 'json',
+            success: function (response) {
+            	mark = response[key];
+            },
+            error: function (e) {
+                console.log(e);
+            }
+    	});
+    });
+</script>
+</body>
+</html>

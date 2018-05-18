@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>添加数据</title>
+    <link href="aspx/css/bootstrap.min.css" rel="stylesheet">
+    <link href="aspx/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">空气质量查询系统</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">空气质量查询系统</a>
+        </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <form action="BackAdminInterface" method="post">
+            <ul class="nav navbar-nav navbar-right">          
+                <li id="nav_login"><button data-toggle='modal' data-target='#myModal'type="submit">返回</button></li>                          
+            </ul>
+          </form>
+        </div>
+    </div><!-- /.container-fluid -->
+            <!-- Collect the nav links, forms, and other content for toggling -->
+
+</nav>
+<div class="container">
+    <div class="tab-content">
+        <div role="tabpanel" class="row tab-pane active" id="index_page">
+            <div class="col-xs-12" style="padding: 10px">
+            </div>
+            <div class="col-xs-12">
+                <table id="table" class="table table-hover table-bordered">
+                    <tr>
+                        <td width='100px'>市</td>
+                        <td>
+		                    <div class="form-group">
+		                        <select class="form-control" id="area" name="area">
+		                            <option>请选择</option>
+		                        </select>
+		                    </div>
+	                    </td>
+                        <td width='100px'>区</td>
+                         <td>
+	                    	<div class="form-group">
+                        		<select class="form-control" id="place" name="place">
+                            		<option>请选择</option>
+                        		</select>
+                    		</div>
+                    	</td>
+                        <td width='100px'>时间</td>
+                        <td>
+	                    	<div class="form-group">
+	                        	<input id="time" class="form-control" readonly>
+	                    	</div>
+                    	</td>
+                    </tr>
+                    <tr>
+                        <td>AQI</td>
+                        <td>
+                    		<div class="form-group">
+	                        	<input id="AQI" class="form-control" >
+	                    	</div>
+                    	</td>
+                    	 <td  width='80px'>PM2.5</td>
+                        <td>
+                    		<div class="form-group">
+	                        	<input id="PM25" class="form-control" >
+	                    	</div>
+                    	</td>
+                        <td  width='80px'>PM10</td>
+                        <td>
+                    		<div class="form-group">
+	                        	<input id="PM10" class="form-control" >
+	                    	</div>
+                    	</td>
+                    </tr>
+                    <tr>                   
+                        <td  width='80px'>CO</td>
+                        <td>
+                    		<div class="form-group">
+	                        	<input id="CO" class="form-control" >
+	                    	</div>
+                    	</td>
+                        <td  width='80px'>NO2</td>
+                    	<td>
+                    		<div class="form-group">
+	                        	<input id="NO2" class="form-control" >
+	                    	</div>
+                    	</td>
+                        <td  width='80px'>O3/h</td>
+                    	<td>
+                    		<div class="form-group">
+	                        	<input id="O3h" class="form-control" >
+	                    	</div>
+                    	</td>	
+                    </tr>
+                    <tr>
+                        <td  width='80px'>O3/8h</td>
+                    	<td>
+                    		<div class="form-group">
+	                        	<input id="O38h" class="form-control" >
+	                    	</div>
+                    	</td>
+                        <td  width='80px'>SO2</td>
+                    	<td>
+                    		<div class="form-group">
+	                        	<input id="SO2" class="form-control" >
+	                    	</div>
+                    	</td>
+                        <td  width='80px'>主要污染物</td>
+                    	<td>
+	                    	<div class="form-group"  id="page1">
+		                        <select class="form-control" id="major" name="major">
+		                            <option>请选择</option>
+		                        </select>
+	                    	</div>
+                    	</td>
+                    </tr>
+                </table>
+                <input class="btn btn-default" id="select" type="button" onclick='send()' value="增加">
+            </div>
+        </div>
+    </div>
+</div>
+<script src="aspx/js/jquery.min.js"></script>
+<script src="aspx/js/bootstrap.min.js"></script>
+<script src="aspx/js/bootstrap-datetimepicker.min.js"></script>
+<script src="aspx/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="aspx/js/Chart.min.js"></script>
+<script>
+
+function send(){
+	var area = document.getElementById('area');
+	var place = document.getElementById('place');
+	var quality = document.getElementById('quality');
+	var time = document.getElementById('time');
+	var AQI = document.getElementById('AQI');
+	var AQItype = document.getElementById('quality');
+	var PM10 = document.getElementById('PM10');
+	var CO = document.getElementById('CO');
+	var NO2 = document.getElementById('NO2');
+	var O3h = document.getElementById('O3h');
+	var O38h = document.getElementById('O38h');
+	var PM25 = document.getElementById('PM25');
+	var major = document.getElementById('major');
+	
+	//检测输入正确性
+    if(area.value != "请选择" && place.value != "请选择" && time.value){
+    	if(parseInt(SO2.value) > 0 || !SO2.value){    		
+	   		if(parseInt(AQI.value) > 0 || !AQI.value){
+	   			if(parseInt(CO.value) > 0 || !CO.value){
+	   				if(parseInt(NO2.value) > 0 || !NO2.value){
+	       				if(parseInt(O3h.value) > 0 || !O3h.value){
+	           				if(parseInt(O38h.value) > 0 || !O38h.value){
+	           		    		//插入操作
+	           		    		var re = "area="+area.value+"&place="+place.value+"&time="+time.value+":00:00"+
+	           		    		"&AQI="+AQI.value+"&PM10="+PM10.value+'&f_COper1h='+CO.value+'&f_NO2per1h='
+	           		    		+NO2.value+'&f_O3per1h='+O3h.value+'&f_O3per8h='+O38h.value+'&f_SO2per1h='+SO2.value+"&PM25="+PM25.value
+	           		    		+"&major="+major.value;
+	           		    		var url = encodeURI(re);
+	           		    		xhr = new XMLHttpRequest();
+	           		    		xhr.open('POST', "Add", true);
+	           		    		xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	           		    		xhr.send(url);
+	           		    		xhr.onreadystatechange = function() {
+	           		    			if (this.readyState != 4)
+	           		    				return;           		    			
+	           		    			//alert(json.length);
+	           		    			if (this.responseText != '[]')
+	           		    				alert("添加成功！");
+	               			       }
+
+	           			}
+	                   else{
+	                   		alert("O3/8h输入有误");
+	                   }
+	       			}
+	              	else{
+	               		alert("O3/h输入有误");
+	               	}
+	   			}
+	           	else{
+	           		alert("NO2输入有误");
+	           	}
+	   		}
+	       else{
+	       		alert("CO输入有误");
+	       }
+	   	}   	
+	   	else{
+	   		alert("AQI输入有误");
+	   	}
+	  }
+    	else{
+    		alert("SO2输入有误");
+    	}
+    }
+    else{
+    	alert("地区和时间不能为空");
+    }
+
+}
+
+//-----------------------------------
+
+    var area = $("#area"),
+        place = $("#place"),
+        time = $('#time'),
+        pollutant = $("#pollutant"),
+        aqitype = $("#quality"),
+        major = $("#major");
+    
+    time.datetimepicker({
+        language: 'zh-CN',
+        autoclose: true,
+        minuteStep: 60,
+        format: 'yyyy-mm-dd hh',
+        defaultDate: "1990-1-1"
+    });
+    $.ajax({
+        url: "./aspx/pollutant.aspx",
+        dataType: 'json',
+        success: function (response) {
+            dic = response;
+            for (var key in response) {
+                major.append('<option>'+key+'</option>');
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+    $.ajax({
+        url: "./aspx/aqitype.aspx",
+        dataType: 'json',
+        success: function (response) {
+            for (var key in response) {
+            	aqitype.append('<option>'+key+'</option>');
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+    
+    $.ajax({
+        url: "./aspx/queryarea.aspx",
+        dataType: 'json',
+        success: function (response) {
+            for (var key in response) {
+                area.append('<option>'+key+'</option>');
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+   
+    area.change(function () {
+        var key = area.val();
+        $.ajax({
+            url: "./aspx/queryarea.aspx",
+            dataType: 'json',
+            success: function (response) {
+            	place.html('');
+            	
+                place.append('<option>请选择</option>');
+                for (var i = 0;i<response[key].length;i++) {
+                    place.append('<option>'+response[key][i]+'</option>');
+                }
+            },
+            error: function (e) {
+                console.log(e);
+            }
+        });
+    });
+    $.ajax({
+        url: "./aspx/pollutant.aspx",
+        dataType: 'json',
+        success: function (response) {
+            dic = response;
+            for (var key in response) {
+                pollutant.append('<option>'+key+'</option>');
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+    pollutant.change(function () {
+    	var key = pollutant.val();
+        $.ajax({
+            url: "./aspx/pollutant.aspx",
+            dataType: 'json',
+            success: function (response) {
+            	mark = response[key];
+            },
+            error: function (e) {
+                console.log(e);
+            }
+    	});
+    });
+</script>
+</body>
+</html>

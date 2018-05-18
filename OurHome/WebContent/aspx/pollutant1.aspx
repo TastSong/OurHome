@@ -1,0 +1,1 @@
+{"PM25per1h":5,"PM10per1h":6,"COper1h":7,"NO2per1h":8,"O3per1h":9,"O3per8h":10,"SO2per1h":11}
