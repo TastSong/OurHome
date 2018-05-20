@@ -27,15 +27,23 @@
 
         <div class="page-container">
             <h1>Login</h1>
-            <form>
+
+              <div>
                 <input type="text" id="username" name="username"  placeholder="Username">
-                <input type="password" id="password" name="password"  placeholder="Password">              
-                <button type="submit" onclick="UserLogin()" >登录</button> 
+                <br>
+                <input type="password" id="password" name="password"  placeholder="Password">  
+                <br>            
+                <button onclick="UserLogin()" >登录</button> 
+                <br>
                 <div class="error"><span>+</span></div>
-            </form>
+            </div>
              <form action="UserRegister.html" method="post">
                 <button type="submit" style="color: black">注册</button>   
             </form>
+            <br>
+            <br>
+             <h3>若网站有BUG，请私信TastSong@Gmail.com</h3>
+             <h2>谢谢</h2>
         </div>
 
         <!-- Javascript -->
@@ -49,22 +57,23 @@
         function UserLogin(){
     		var username = document.getElementById('username');
     		var password = document.getElementById('password');
-    		var re = "userLogin?username="+username.value+"&password="+password.value;
+    		var re = "username="+username.value+"&password="+password.value;
     		var url = encodeURI(re);
     		xhr = new XMLHttpRequest();
-    		xhr.open('GET', url, true);
-    		xhr.send();
+    		xhr.open('POST', 'UserLogin', true);
+    		xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    		xhr.send(url);
     		xhr.onreadystatechange = function() {
     			if (this.readyState != 4)
     				return;
-
+    			
     			if (this.responseText != '[]')
     			{
     				var json=JSON.parse( this.responseText );
     				if(json.result){
     					//用户密码正确后跳转
     				    var form=document.forms[0];
-    				    form.action="gotoUserQuery?param=formMethod";
+    				    form.action="GotoUserQuery";
     				    form.submit();
     				}
     				else{

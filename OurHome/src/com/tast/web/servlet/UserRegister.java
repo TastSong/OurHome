@@ -110,7 +110,8 @@ public class UserRegister extends HttpServlet {
 			  while(rs.next()) 
 			  {
 				   //System.out.println(rs.getString("username") + "\t" + rs.getString("password")); 
-				   if(userName.equals(rs.getString("username")) )
+				  String username = rs.getString("username");
+				   if(username.equals(userName) )
 				   {
 						return true;
 				   }

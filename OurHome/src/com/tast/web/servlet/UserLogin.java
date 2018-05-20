@@ -43,7 +43,7 @@ public class UserLogin<ONObject> extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		
-		if(UserLog(username, password))
+		if(IsHavaUser(username, password))
 		{//用户密码正确
 			 JsonObject subJsonObj = new JsonObject();
 			 subJsonObj.addProperty("result", true);
@@ -66,7 +66,8 @@ public class UserLogin<ONObject> extends HttpServlet {
 
 	}
 
-	 public boolean UserLog(String userName, String password)
+
+	 public boolean IsHavaUser(String userName, String password)
 	 {
 		 //驱动程序名
 		  String driver = "com.mysql.jdbc.Driver";
@@ -77,42 +78,44 @@ public class UserLogin<ONObject> extends HttpServlet {
 		  // MySQL密码
 		  String passwordSQL = "1647283556";
 		  // 开始连接数据库
+		  Connection conn = null;
+		  Statement statement = null;
+		  ResultSet rs = null;
 		  try 
 		  {
 			 // 加载驱动程序
 			 Class.forName(driver);
 			 // 连续数据库
-			 Connection conn = DriverManager.getConnection(url, user, passwordSQL);
+			 conn = DriverManager.getConnection(url, user, passwordSQL);
 			 if(!conn.isClosed())
 			 {
 				 System.out.println("connecting to the database successfully!");
 			 }
 			 
 			 // statement用来执行SQL语句
-			 Statement statement = conn.createStatement();
+			 statement = conn.createStatement();
 			 // select语句
-			 String sql = "select username, password from login";
+			 String sql = "select * from login;";
 
-			 ResultSet rs = statement.executeQuery(sql);  
+			 rs = statement.executeQuery(sql);  
 
 			  // 输出student的所有信息
 			  while(rs.next()) 
-			  {
-				   //System.out.println(rs.getString("username") + "\t" + rs.getString("password")); 
-				   if(userName.equals(rs.getString("username")) )
+			  {//不能直接比较，必须先将rs.getString("username")复制给username
+				   String username = rs.getString("username");
+				   String pass = rs.getString("password");
+
+				   if(username.equals(userName))
 				   {
-					   if(password.equals( rs.getString("password")))
+					   if(pass.equals(password))
 					   {
 						   System.out.println("登陆成功");
 						   return true;
 					   }
+						
 				   }
-			   } 
-
-			  rs.close(); 
-			  conn.close(); 
-			  conn.close();  
-			  
+			   } 	
+			   		  
 		 } catch(ClassNotFoundException e) 
 		  {  
 			  System.out.println("sorry, can't find the driver!");  
@@ -126,7 +129,15 @@ public class UserLogin<ONObject> extends HttpServlet {
 		  {
 			  e.printStackTrace();
 			  
-		  }
+		  }finally {
+          	try {
+	          	rs.close(); //
+	          	statement.close();
+	          	conn.close();
+          	}catch(SQLException e) {
+          		e.printStackTrace();
+          	}
+          }
 
 		  return false;
 	 }

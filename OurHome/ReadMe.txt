@@ -23,4 +23,7 @@
                                                的步骤，经过测试，如果在一个servlet类中既有查询又有插入，界面就不能跳转，所以我又添加一个servlet
                                                进行变跳转边插入用户信息                               
                                      
- 
+2018.5.18 - 2018.5.19    将修改好的弹窗代码布置到服务器，但是出现不能正常使用的情况，经过调试发现是因为，
+                                                                    采用ajax进行前后传输过程中，password被在url中显示，所以谷歌火狐不能正常使用， 
+                                                                    将传输方式改成POST，并加上xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded"); 
+                                                                           且用form.action="GotoUserQueryRe";跳转时页面中要有form标签          

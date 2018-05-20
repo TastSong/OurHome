@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <servlet>
-    <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>com.tast.web.servlet.LoginServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/login</url-pattern>
-  </servlet-mapping>
-  <servlet>
     <servlet-name>UserLogin</servlet-name>
     <servlet-class>com.tast.web.servlet.UserLogin</servlet-class>
   </servlet>
@@ -23,14 +15,6 @@
   <servlet-mapping>
     <servlet-name>UserRegister</servlet-name>
     <url-pattern>/userRegister</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>GotoUserQuery</servlet-name>
-    <servlet-class>com.tast.web.servlet.GotoUserQuery</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>GotoUserQuery</servlet-name>
-    <url-pattern>/gotoUserQuery</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>AdminLogin</servlet-name>

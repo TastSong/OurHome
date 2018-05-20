@@ -27,10 +27,16 @@
 
         <div class="page-container">
             <h1>Register</h1>
+             <div>
+                <input type="text" id="username" name="username"  placeholder="Username">
+                <br>
+                <input type="password" id="password" name="password"  placeholder="Password">  
+                <br>            
+                <button type="submit" onclick="UserRegister()" >注册</button> 
+                <br>
+                <div class="error"><span>+</span></div>
+            </div>
             <form>
-                <input  id="username" type="text" name="username"  placeholder="Username">
-                <input id="password" type="password" name="password"  placeholder="Password">         
-                <button type="submit" onclick="UserRegister()" >注册</button>  
             </form>
         </div>
 
@@ -39,26 +45,27 @@
         <script src="assets/js/supersized.3.2.7.min.js"></script>
         <script src="assets/js/supersized-init.js"></script>
         <script src="assets/js/scripts.js"></script>
-         <script>
+        <script>
         function UserRegister(){
     		var username = document.getElementById('username');
     		var password = document.getElementById('password');
-    		var re = "userRegister?username="+username.value+"&password="+password.value;
+    		var re = "username="+username.value+"&password="+password.value;
     		var url = encodeURI(re);
     		xhr = new XMLHttpRequest();
-    		xhr.open('GET', url, true);
-    		xhr.send();
+    		xhr.open('POST', 'UserRegister', true);
+    		xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    		xhr.send(url);
     		xhr.onreadystatechange = function() {
     			if (this.readyState != 4)
     				return;
     			
     			if (this.responseText != '[]')
     			{
-    				var json = JSON.parse(this.responseText);
+    				var json=JSON.parse( this.responseText );
     				if(json.result){
-    					//用户密码正确后跳转  					
+    					//用户密码正确后跳转
     				    var form=document.forms[0];
-    				    form.action="GotoUserQueryRe?param=formMethod";
+    				    form.action="GotoUserQueryRe";
     				    form.submit();
     				}
     				else{
