@@ -26,4 +26,6 @@
 2018.5.18 - 2018.5.19    将修改好的弹窗代码布置到服务器，但是出现不能正常使用的情况，经过调试发现是因为，
                                                                     采用ajax进行前后传输过程中，password被在url中显示，所以谷歌火狐不能正常使用， 
                                                                     将传输方式改成POST，并加上xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded"); 
-                                                                           且用form.action="GotoUserQueryRe";跳转时页面中要有form标签          
+                                                                           且用form.action="GotoUserQueryRe";跳转时页面中要有form标签
+
+2018.5.28 - 2018.6.1     将选择的时间控制在，数据库拥有项内，并添加未来一小时空气质量（相对于数据库时间）预测功能         

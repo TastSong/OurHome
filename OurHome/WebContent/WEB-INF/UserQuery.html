@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>空气质量查询网站</title>
+    <title>山东省空气质量查询网站</title>
     <link href="aspx/css/bootstrap.min.css" rel="stylesheet">
     <link href="aspx/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
     
@@ -10,9 +10,13 @@
         function judge()
         {
         	if(sign == 2)
-            	zxc2();
+        		DisplayGraphs2();
         	if(sign == 3)
-        		zxc3();
+        		DisplayGraphs3();
+        	if(sign == 4){
+        		DisplayGraphs4();
+        	}
+        	
         }
     </script>
      
@@ -33,12 +37,12 @@
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">空气质量查询系统</span>
+                <span class="sr-only">山东省空气质量查询系统</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">空气质量查询系统</a>
+            <a class="navbar-brand" href="#">山东省空气质量查询系统</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -47,7 +51,8 @@
             <ul class="nav navbar-nav" role="tablist">
                 <li class="active"><a aria-controls="index_page" role="tab" data-toggle="tab" onclick='ona1click()'>主要污染物</a></li>
                 <li><a aria-controls="chart_page" role="tab" data-toggle="tab" onclick='ona2click()'>污染物数值</a></li>
-                <li><a aria-controls="table_page" role="tab" data-toggle="tab" onclick='ona3click(3)'>天气质量</a></li>
+                <li><a aria-controls="table_page" role="tab" data-toggle="tab" onclick='ona3click()'>天气质量</a></li>
+               <li><a aria-controls="table_page" role="tab" data-toggle="tab" onclick='ona4click()'>预测</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">          
                 <li id="nav_login"><button data-toggle='modal' data-target='#myModal'type="submit">管理员登录</button></li>          
@@ -68,15 +73,26 @@
                             <option>请选择</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label" for="place">请选择区域</label>
+                    <div class="form-group" id='prediction'>
+                        <label class="control-label" >请选择检查点</label>
                         <select class="form-control" id="place" name="place">
                             <option>请选择</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label" for="time">请选择时间</label>
-                        <input id="time" class="form-control" readonly>
+                    <div class="form-group" id='time'>
+                        <label class="control-label"  id='time'>请选择时间</label>
+                        <select class="form-control" id="year" name="place">
+                           <option>年</option>
+                        </select>
+                        <select class="form-control" id="month" name="place">
+                            <option>月</option>
+                        </select>
+                        <select class="form-control" id="day" name="place">
+                            <option>日</option>
+                        </select>
+                        <select class="form-control" id="hour" name="place">
+                            <option>时</option>
+                        </select>
                     </div>
                     <div class="form-group"  id="page1">
                         <label class="control-label" for="major">请选择主要污染物</label>
@@ -97,7 +113,8 @@
                         </select>
                     </div>
                     <input class="btn btn-default" id="select" type="button" onclick="ycit()" value="查询">
-                    <input class="btn btn-default" type="button" onclick="send2()" value="图表">
+                    <input class="btn btn-default" type="button" onclick="send2()" value="图表" id='myChart' style="display:none">
+                    <input class="btn btn-default" type="button" onclick="send3()" value="预测" id='myPrediction' style="display:none">
                 </form>
             </div>
             <div id="box" class="col-xs-12">
@@ -121,8 +138,8 @@
                     </thead>
                     <tbody id="tbody">
                     </tbody>
-                </table>
-            </div>
+                 </table>
+        	</div>
         </div>
     </div>
 </div>
@@ -134,7 +151,8 @@
 <script src="aspx/js/Chart.min.js"></script>
 <script>
 sign = 1;
-var mark = 0;
+
+mark = 0;
 var otable = document.getElementById('table');
 var oth = otable.getElementsByTagName('th')
 function init(){
@@ -142,6 +160,12 @@ function init(){
 	var page1 = document.getElementById('page1');
 	var page2 = document.getElementById('page2');
 	var page3 = document.getElementById('page3');
+	document.getElementById('prediction').style.display='inline-block';
+	document.getElementById('select').style.display='inline-block';
+	document.getElementById('time').style.display='inline-block';
+	document.getElementById('myPrediction').style.display='none';
+	document.getElementById('box').style.display='block';
+	document.getElementById('myChart').style.display='none';
 	page1.style.display = 'none';
 	page2.style.display = 'none';
 	page3.style.display = 'none';
@@ -158,20 +182,33 @@ function ona1click(){
 	oth[12].style.display = 'table-cell';
 }
 function ona2click(){
-	var page2 = document.getElementById('page2');
 	init();
+	var page2 = document.getElementById('page2');
+	document.getElementById('myChart').style.display='inline-block';
+	
 	page2.style.display='inline-block';
 	sign = 2;
 	oth[5].style.display = 'table-cell';
 	//oth[12].style.display = 'table-cell';
 }
 function ona3click(){
-	var page3 = document.getElementById('page3');
 	init();
+	var page3 = document.getElementById('page3');
+	document.getElementById('myChart').style.display='inline-block';
+	
 	page3.style.display='inline-block';
 	sign = 3;
 	oth[4].style.display = 'table-cell';
 	oth[3].style.display = 'table-cell';
+}
+
+function ona4click(){
+	init();
+	document.getElementById('prediction').style.display='none';
+	document.getElementById('time').style.display='none';
+	document.getElementById('myPrediction').style.display='inline-block';
+	document.getElementById('box').style.display='none';
+	document.getElementById('select').style.display='none';
 }
 
 var Tbody = document.getElementById('tbody');
@@ -182,10 +219,11 @@ function changeTable1(a, c, b, d, e, f, g, h, i, j, k, l, m) {
     Tbody.appendChild(otr);
     
 }
+
 function changeTable2(a, c, b, d, e, f, g, h, i, j, k, l, m) {
 	var mtr = document.getElementById("table");
 	var ths = mtr.getElementsByTagName('th');
-    var otr = document.createElement('tr');
+    var otr = document.createElement('tr'); 
     if (mark == 5)
    		otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+f+'</td>';
    	if (mark == 6)
@@ -212,18 +250,7 @@ function changeTable3(a, c, b, d, e, f, g, h, i, j, k, l, m) {
     Tbody.appendChild(otr);
     
 }
-/*
-function changeTable3(a, b, c, d, e, f, g, h, i, j, k, l, m) {
-	var mtr = document.getElementById("table");
-	var ths = mtr.getElementsByTagName('th');
-    var otr = document.createElement('tr');
-    otr.innerHTML = "<td>"+a+'</td><td>'+b+'</td><td>'+c+'</td><td>'+d+'</td><td>'+e+'</td><td>'+f+'</td>'+
-    '<td>'+g+'</td><td>'+h+'</td><td>'+i+'</td><td>'+j+'</td><td>'+k+'</td><td>'+l+'</td><td>'+m+'</td>';
-    var newtd = otr.getElementsByTagName('td');
-    Tbody.appendChild(otr);
-    
-}
-*/
+
 function clearTab(){
 	var tbody = document.getElementById('tbody');
 	while (tbody.hasChildNodes())
@@ -233,14 +260,22 @@ function clearTab(){
 }
 
 function send(){
+	clearTab();
 	if(JudgmentQueryCondition()){
-		clearTab();
 		var area = document.getElementById('area');
 		var place = document.getElementById('place');
 		var quality = document.getElementById('quality');
-		var time = document.getElementById('time');
+		var year = document.getElementById('year');
+		var month = document.getElementById('month');
+		var day = document.getElementById('day');
+		var hour = document.getElementById('hour');
 		var major = document.getElementById('major');
-		var re = "DealData?area="+area.value+"&place="+place.value+"&quality="+quality.value+"&time="+time.value+":00:00"+"&major="+major.value;
+		if (year.value != "年" && (month.value == '月' || day.value == '日' || hour.value == '时')){
+			alert('时间不正确');
+			return;
+		}
+		var time = year.value+"-"+month.value+"-"+day.value+" "+hour.value;
+		var re = "DealData?area="+area.value+"&place="+place.value+"&quality="+quality.value+"&time="+time+"&major="+major.value;
 		var url = encodeURI(re);
 		xhr = new XMLHttpRequest();
 		xhr.open('GET', url, true);
@@ -268,44 +303,108 @@ function send(){
 	    }
 	}
 	else{
-		alert("请输入要查询的类型");
+		alert("请输入污染物");
 	}
 }
+
+function SendServal(ServalName, deadline){
+	var area = document.getElementById('area');
+	var place = document.getElementById('place');
+	var quality = document.getElementById('quality');
+	var year = document.getElementById('year');
+	var month = document.getElementById('month');
+	var day = document.getElementById('day');
+	var hour = document.getElementById('hour');
+	var major = document.getElementById('major');
+	var time = year.value+"-"+month.value+"-"+day.value+" "+hour.value;
+	var re = ServalName+"?area="+area.value+"&place="+place.value+"&quality="+quality.value+"&time="+
+			time+"&deadline="+deadline+"&major="+major.value;
+	var url = encodeURI(re);
+	xhr = new XMLHttpRequest();
+	xhr.open('GET', url, true);
+	xhr.send();
+	xhr.onreadystatechange = function() {
+		if (this.readyState != 4)
+			return;
+		if (this.responseText != '[]')
+			{
+				js = eval(this.responseText);
+				judge();
+			}
+			
+		else{
+			alert("该项为空");				
+		}	       
+	}
+}
+
+
 function send2(){
 	if(JudgmentQueryCondition()){
 		clearTab();	
 	    document.getElementById("box").style.display = "none";
 	    document.getElementById("container").style.display = "block";
-		var area = document.getElementById('area');
+	    var area = document.getElementById('area');
 		var place = document.getElementById('place');
 		var quality = document.getElementById('quality');
-		var time = document.getElementById('time');
+		var year = document.getElementById('year');
+		var month = document.getElementById('month');
+		var day = document.getElementById('day');
+		var hour = document.getElementById('hour');
 		var major = document.getElementById('major');
-		var re = "DealData?area="+area.value+"&place="+place.value+"&quality="+quality.value+"&time="+time.value+":00:00"+"&major="+major.value;
-		var url = encodeURI(re);
-		xhr = new XMLHttpRequest();
-		xhr.open('GET', url, true);
-		xhr.send();
-		xhr.onreadystatechange = function() {
-			if (this.readyState != 4)
-				return;
-			if (this.responseText != '[]')
-				{
-					js = eval(this.responseText);	
-					judge();
-				}
-				
-			else{
-				alert("该项为空");				
-			}	       
+		if (year.value != "年" && (month.value == '月' || day.value == '日' || hour.value == '时')){
+			alert('时间不正确');
+			return;
 		}
+		var deadline = "0";
+		if(year.value!= "年" && month.value != '月' && day.value != '日' && hour.value != '时'){
+			//用户输入起始时间
+			deadline = prompt("输入要查询从起始时间后多少小时的数据", "数值");
+			if(parseInt(deadline) < 0){
+				alert("数值不合理");
+				return;
+			}
+			SendServal('ExcelData', deadline);
+		}
+		else {
+			SendServal('DealData', '1')
+		}
+	}	
+
+			
+}
+function send3(){
+	//预测查询
+		clearTab();
+		var area = document.getElementById('area');
+		
+		if (area.value != '请选择 '){
+			xhr = new XMLHttpRequest();
+			xhr.open('GET', "Prediction?area="+area.value, true);
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (this.readyState != 4)
+					return;
+				
+				//alert(json.length);
+				if (this.responseText != '[]')
+				{
+					js = eval(this.responseText);
+					sign = 4;
+					judge();				
+				}
+				else{
+					alert("该项为空");
+				}
+	    }
 	}
 	else{
 		alert("请输入要查询的类型");
 	}
 }
+
 function JudgmentQueryCondition(){
-	if(sign == 2){		
+	if(sign == 2){
 		if(0 == mark){
 			return 0;
 		}
@@ -315,20 +414,58 @@ function JudgmentQueryCondition(){
 	}
 	return 1;
 }
+var year = document.getElementById("year");
+var month = document.getElementById("month");
+var day = document.getElementById("day");
+var hour = document.getElementById("hour");
+
+function setTime(year, month, day, tag){
+	tag.options.length=1;
+	xhr = new XMLHttpRequest();
+	var rs = 'TimeDeal?year='+year+'&month='+month+'&day='+day;
+	//alert(rs);
+	var url = encodeURI(rs);
+	xhr.open('GET', url, true);
+	xhr.send();
+	xhr.onreadystatechange = function() {
+		if (this.readyState != 4)
+			return;
+				//alert(json.length);
+		
+		if (this.responseText != '[]')
+		{
+			data = eval(this.responseText);
+			
+			//alert(json.data);
+			for (var i = 0; i < data.length; i++){
+				var option = document.createElement('option');
+				
+				tag.options.add(new Option(data[i],data[i]));;
+			}
+		}
+	}
+}
+
+setTime("","","",year);
+
+year.onchange = function(){
+	
+	setTime(year.value,"","",month);
+}
+month.onchange = function(){
+	setTime(year.value,month.value,"",day);
+}
+day.onchange = function(){
+	setTime(year.value,month.value,day.value,hour);
+}
+
     var area = $("#area"),
         place = $("#place"),
-        time = $('#time'),
         pollutant = $("#pollutant"),
         aqitype = $("#quality"),
         major = $("#major");
     
-    time.datetimepicker({
-        language: 'zh-CN',
-        autoclose: true,
-        minuteStep: 60,
-        format: 'yyyy-mm-dd hh',
-        defaultDate: "1990-1-1"
-    });
+    
     $.ajax({
         url: "./aspx/pollutant.aspx",
         dataType: 'json',
@@ -412,14 +549,16 @@ function JudgmentQueryCondition(){
             }
     	});
     });
+    
 </script>
-<div id="container" style="min-width:800px;height:600px;margin:0 auto;"></div>
+<div id="container" style="min-width:800px;height:600px;margin:0 auto;">
 
-<div id="abc">
+<div id="abc"></div>
+</div>
 	<script src="assets/js/highcharts.js"></script>
     <script>
         // 图表配置
-        function zxc2()
+        function DisplayGraphs2()
         {
         	var options = {
     chart: {
@@ -433,7 +572,7 @@ function JudgmentQueryCondition(){
             xAxis: {},
             yAxis: {
                 title: {
-                    text: '污染指数'                // y 轴标题
+                    text: '污染指数(33μg/m³)'                // y 轴标题
                 }
             },
     series: [{}]
@@ -509,7 +648,7 @@ function JudgmentQueryCondition(){
         	options.series[0].data = datas;
 var chart = new Highcharts.Chart('container', options);
 }
-        function zxc3()
+        function DisplayGraphs3()
         {
         	var options = {
     chart: {
@@ -523,7 +662,7 @@ var chart = new Highcharts.Chart('container', options);
             xAxis: {},
             yAxis: {
                 title: {
-                    text: '空气指数'                // y 轴标题
+                    text: '空气指数/AQI'                // y 轴标题
                 }
             },
     series: [{}]
@@ -542,11 +681,69 @@ var chart = new Highcharts.Chart('container', options);
         			datas[z] = js[z].d;
         			}
         		options.series[0].name = '空气指数 ';
+        	options.series[0].data = datas;
+var chart = new Highcharts.Chart('container', options);
+}
+function DisplayGraphs4()
+{
+	
+    var options = {
+    chart: {
+        renderTo: 'container',
+        type: 'line',
+        inverted: false
+    },
+    title: {
+                    text:'空气质量预测图'           // 标题
+            },
+    subtitle: {
+				text: '前2小时为实际值，后1小时为预测值'
+		},
+    		
+            xAxis: {},
+            yAxis: {
+                title: {
+                    text: '/AQI '                // y 轴标题
+                }
+            },
+    series: [{
+    	 zoneAxis: 'x',
+    	 zones: [{
+    	             value: 2,
+    	          },
+    	          {
+    	        	  
+    	        	  color:'red',
+    	          }]
+    }]
+};
+        	var datas=new Array();
+        	var times=new Array();
+        	var i = 0;
+        	for (var z in js[0])
+        	{
+        		times[i++] = z;
+        	}
+        	//alert(times);
+        	options.xAxis.categories = times;
+        	
+        	var j = 0;
+        
+        		for (var z in js[0])
+        			{
+        			//alert(js[0][z])
+        			datas[j++] = js[0][z];
+        			}
+        		//alert(datas);
+        		options.series[0].name = '预测的空气指数';
+        		
     		
         	options.series[0].data = datas;
 var chart = new Highcharts.Chart('container', options);
 }
-        </script>
-</div>
+
+        
+</script>
+
 </body>
 </html>

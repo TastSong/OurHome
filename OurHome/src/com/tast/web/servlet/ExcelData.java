@@ -7,7 +7,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,24 +22,34 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 /**
- * Servlet implementation class DealData
+ * Servlet implementation class ExcelData
  */
-@WebServlet("/DealData")
-public class DealData extends HttpServlet {
+@WebServlet("/ExcelData")
+public class ExcelData extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public DealData() {
+    public ExcelData() {
         super();
         // TODO Auto-generated constructor stub
     }
+    private String Deadline(String startTime, String h) throws ParseException {
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date d = format.parse(startTime);
+		Calendar c = Calendar.getInstance();    
+	    c.setTime(d);   //设置时间  
+	    c.add(Calendar.HOUR, Integer.parseInt(h)); //日期分钟加1,Calendar.DATE(天),Calendar.HOUR(小时)    
+	    Date deadline = c.getTime(); //结果  
+		return format.format(deadline); 
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		Connection con = null;
 		Statement stm = null;
@@ -57,7 +70,8 @@ public class DealData extends HttpServlet {
 					"jdbc:mysql://localhost:3306/ourhome", "root", "1647283556");
 			stm = con.createStatement();
 			String sql = "SELECT distinct * FROM t_pm25 ";
-
+			System.out.println(time);
+			String time2 = Deadline(time, deadlineH);
 			
 			if (area != null && !area.equals(Jude))
 			{
@@ -66,8 +80,8 @@ public class DealData extends HttpServlet {
 					sql = sql + " AND f_place='"+place+"'";
 				if(pollutant != null && !pollutant.equals(Jude))
 					sql = sql + " AND f_AQItype='"+pollutant+"'";
-				if (time != null && !time.equals("年-月-日 时"))
-					sql = sql + " AND f_time='"+time+"'";
+				if (time != null && !time.equals("年-月-日-时"))
+					sql = sql + " AND f_time>'"+time+"' AND f_time<'"+time2+"'";
 				if(major != null && !major.equals(Jude))
 					sql = sql + " AND f_majorpollutant='"+major+"'";
 			}
@@ -76,28 +90,31 @@ public class DealData extends HttpServlet {
 				sql = sql + " WHERE f_place='"+place+"'";
 				if(pollutant != null && !pollutant.equals(Jude))
 					sql = sql + " AND f_AQItype='"+pollutant+"'";
-				if (time != null && !time.equals("年-月-日 时"))
-					sql = sql + " AND f_time='"+time+"'";
+				if (time != null && !time.equals("年-月-日-时"))
+					sql = sql + " AND f_time>'"+time+"' AND f_time<'"+time2+"'";
 				if(major != null && !major.equals(Jude))
 					sql = sql + " AND f_majorpollutant='"+major+"'";
 			}
 			else if(pollutant != null && !pollutant.equals(Jude))
 			{
 				sql = sql + "WHERE f_AQItype='"+pollutant+"'";
-				if (time != null && !time.equals("年-月-日 时"))
-					sql = sql + " AND f_time='"+time+"'";
+				if (time != null && !time.equals("年-月-日-时"))
+					sql = sql + " AND f_time>'"+time+"' AND f_time<'"+time2+"'";
 				if(major != null && !major.equals(Jude))
 					sql = sql + " AND f_majorpollutant='"+major+"'";
 			}
-			else if (!time.equals("年-月-日 时") && time != null )
+			else if (!time.equals("年-月-日-时") && time != null )
 			{
-				sql = sql + "WHERE f_time='"+time+"'";
+				//System.out.println( Integer.parseInt(deadlineH));
+				sql = sql + " AND f_time>'"+time+"' AND f_time<'"+time2+"'";
 				if(major != null && !major.equals(Jude))
 					sql = sql + " AND f_majorpollutant='"+major+"'";
 			}
-			else if (!time.equals("年-月-日 时") && time != null )
+			else if (!time.equals("年-月-日-时") && time != null )
 			{
-				sql = sql + "WHERE f_time='"+time+"'";
+				
+				
+				sql = sql + " AND f_time>'"+time+"' AND f_time<'"+time2+"'";
 				if(major != null && !major.equals(Jude))
 					sql = sql + " AND f_majorpollutant='"+major+"'";
 			}
@@ -159,7 +176,10 @@ public class DealData extends HttpServlet {
 			}catch(ClassNotFoundException e)
             {
             	e.printStackTrace();
-            }finally {
+            } catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}finally {
             	try {
             	rs.close();
             	stm.close();
@@ -177,6 +197,5 @@ public class DealData extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
+
 }
-
-
